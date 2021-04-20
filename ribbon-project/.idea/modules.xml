@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/IpAnalyzer.iml" filepath="$PROJECT_DIR$/IpAnalyzer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ipanalyzer/ipanalyzer.iml" filepath="$PROJECT_DIR$/ipanalyzer/ipanalyzer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ipanalyzer-eureka-server/ipanalyzer-eureka-server.iml" filepath="$PROJECT_DIR$/ipanalyzer-eureka-server/ipanalyzer-eureka-server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ipanalyzer-ribbon-server/ipanalyzer-ribbon-server.iml" filepath="$PROJECT_DIR$/ipanalyzer-ribbon-server/ipanalyzer-ribbon-server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spring-boot-ribbon.iml" filepath="$PROJECT_DIR$/spring-boot-ribbon.iml" />
+    </modules>
+  </component>
+</project>
