@@ -1,7 +1,9 @@
 package com.challenge.ipanalyzer.controllers;
 
 import com.challenge.ipanalyzer.model.BlacklistedIpAddress;
+import com.challenge.ipanalyzer.model.IpAddress;
 import com.challenge.ipanalyzer.services.BlacklistedIpAddressService;
+import com.challenge.ipanalyzer.services.IpAddressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,34 +12,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/blacklistedipaddress")
-public class BlacklistedIpAddressController {
+@RequestMapping("/ipaddress")
+public class IpAddressController {
 
     @Autowired
-    private BlacklistedIpAddressService blacklistedIpAddressService;
+    private IpAddressService ipAddressService;
 
     @CrossOrigin(origins = "*")
-    @PostMapping
-    public @ResponseBody ResponseEntity<Object> createBlacklistedIpAddress(@RequestBody BlacklistedIpAddress blacklistedIpAddress) {
+    @GetMapping("/info")
+    public @ResponseBody ResponseEntity<Object> getIpInfo(@RequestParam(value = "ip") String ip, @RequestParam(value = "requestIp") String requestIp) {
 
         try {
 
-            BlacklistedIpAddress response = blacklistedIpAddressService.create(blacklistedIpAddress);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e) {
-
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @CrossOrigin(origins = "*")
-    @GetMapping("/all")
-    public @ResponseBody ResponseEntity<Object> getAll() {
-
-        try {
-
-            List<BlacklistedIpAddress> response = blacklistedIpAddressService.findAll();
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return ipAddressService.findIpAddressInfo(ip, requestIp);
         } catch (Exception e) {
 
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

@@ -1,0 +1,117 @@
+version: "3.7"
+services:
+  myapp-mysql:
+    container_name: myapp-mysql
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - mypath:/root/dumps
+    ports:
+      - 3306:3306
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=mydatabase
+      - MYSQL_USER=myapp-user
+      - MYSQL_PASSWORD=password
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 10s
+      retries: 1
+  ipanalyzer-eureka-server:
+    image: ipanalyzer-eureka-server
+    build:
+      context: ./ipanalyzer-eureka-server
+      dockerfile: Dockerfile
+    ports:
+      - '8761:8761'
+    volumes:
+      - /data/ipanalyzer-spring-boot-app
+  ipanalyzer:
+    image: ipanalyzer
+    build:
+      context: ./ipanalyzer
+      dockerfile: Dockerfile
+    ports:
+      - '9090:9090'
+    volumes:
+      - /data/ipanalyzer-spring-boot-app
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://myapp-mysql:3306/mydatabase?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+      - DATABASE_HOST=myapp-mysql
+      - SPRING.DATASOURCE.DRIVERCLASSNAME=com.mysql.cj.jdbc.Driver
+      - SPRING.DATASOURCE.DRIVER-CLASS-NAME=com.mysql.cj.jdbc.Driver
+      - SPRING.DATASOURCE.USERNAME=myapp-user
+      - SPRING.DATASOURCE.PASSWORD=password
+      - SPRING.JPA.HIBERNATE.DDL-AUTO=update
+      - SPRING.JPA.GENERATE-DDL=true
+      - SPRING.JPA.PROPERTIES.HIBERNATE.GLOBALLY_QUOTED_IDENTIFIERS=true
+      - SPRING.JPA.PROPERTIES.HIBERNATE.DIALECT=org.hibernate.dialect.MySQL8Dialect
+      - spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
+      - EUREKA.CLIENT.SERVICEURL.DEFAULTZONE=http://ipanalyzer-eureka-server:8761/eureka/
+      - EUREKA.CLIENT.HEALTHCHECK.ENABLED= true
+      - SERVER.PORT=9090
+      - SPRING.CLOUD.DISCOVERY.ENABLED=true
+      - SPRING.CLOUD.CONFIG.ENABLED=true
+    depends_on:
+      myapp-mysql:
+        condition: service_healthy
+    links:
+      - myapp-mysql
+      - ipanalyzer-eureka-server
+  ipanalyzer2:
+    image: ipanalyzer
+    build:
+      context: ./ipanalyzer
+      dockerfile: Dockerfile
+    ports:
+      - '9091:9091'
+    volumes:
+      - /data/ipanalyzer-spring-boot-app
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://myapp-mysql:3306/mydatabase?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+      - DATABASE_HOST=myapp-mysql
+      - SPRING.DATASOURCE.DRIVERCLASSNAME=com.mysql.cj.jdbc.Driver
+      - SPRING.DATASOURCE.DRIVER-CLASS-NAME=com.mysql.cj.jdbc.Driver
+      - SPRING.DATASOURCE.USERNAME=myapp-user
+      - SPRING.DATASOURCE.PASSWORD=password
+      - SPRING.JPA.HIBERNATE.DDL-AUTO=update
+      - SPRING.JPA.GENERATE-DDL=true
+      - SPRING.JPA.PROPERTIES.HIBERNATE.GLOBALLY_QUOTED_IDENTIFIERS=true
+      - SPRING.JPA.PROPERTIES.HIBERNATE.DIALECT=org.hibernate.dialect.MySQL8Dialect
+      - spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
+      - EUREKA.CLIENT.SERVICEURL.DEFAULTZONE=http://ipanalyzer-eureka-server:8761/eureka/
+      - EUREKA.CLIENT.HEALTHCHECK.ENABLED= true
+      - SERVER.PORT=9091
+      - SPRING.CLOUD.DISCOVERY.ENABLED=true
+      - SPRING.CLOUD.CONFIG.ENABLED=true
+    depends_on:
+      myapp-mysql:
+        condition: service_healthy
+    links:
+      - myapp-mysql
+      - ipanalyzer-eureka-server
+  ipanalyzer-ribbon-server:
+    image: ipanalyzer-ribbon-server
+    build:
+      context: ./ipanalyzer-ribbon-server
+      dockerfile: Dockerfile
+    ports:
+      - '8888:8888'
+    volumes:
+      - /data/ipanalyzer-spring-boot-app
+    environment:
+      - EUREKA.CLIENT.SERVICEURL.DEFAULTZONE=http://ipanalyzer-eureka-server:8761/eureka/
+      - EUREKA.CLIENT.HEALTHCHECK.ENABLED=true
+      - EUREKA.INSTANCE.LEASERENEWALINTERVALINSECONDS=1
+      - EUREKA.INSTANCE.LEASEEXPIRATIONDURATIONINSECONDS=2
+      - SERVER.RIBBON.EUREKA.ENABLED=true
+      - SERVER.RIBBON.SERVERLISTREFRESHINTERVAL=1000
+      - SPRING.CLOUD.DISCOVERY.ENABLED=true
+      - SPRING.CLOUD.CONFIG.ENABLED=true
+    links:
+      - ipanalyzer-eureka-server
+      - ipanalyzer
+      - ipanalyzer2
+volumes:
+  mypath:

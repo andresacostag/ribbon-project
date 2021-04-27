@@ -1,4 +1,5 @@
-FROM java:8
+FROM openjdk:8-jdk-alpine
+VOLUME /tmp
 EXPOSE 8761
-ADD /target/netflix-eureka-naming-server-1.0.jar netflix-eureka-naming-server-1.0.jar
-ENTRYPOINT ["java","-jar","netflix-eureka-naming-server-1.0.jar"]
+ADD /target/*.jar app.jar
+ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /app.jar" ]

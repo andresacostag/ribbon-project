@@ -8,9 +8,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
-public class MyClientSideController {
+@RequestMapping("/client")
+public class LoadBalancerController {
     @LoadBalanced
     @Bean
     RestTemplate restTemplate() {
@@ -21,20 +26,42 @@ public class MyClientSideController {
     @Autowired
     RestTemplate restTemplate;
 
-    @RequestMapping("/client/frontend")
+    @GetMapping("/frontend")
     public String hi() {
 
         String randomString = this.restTemplate.getForObject("http://server/backend", String.class);
         return "Server Response :: " + randomString;
     }
 
-    @RequestMapping("/client/ipaddress")
-    @PostMapping
-    public @ResponseBody ResponseEntity<BlacklistedIpAddressDTO> createBlacklistedIpAddress(@RequestBody BlacklistedIpAddressDTO blacklistedIpAddress){
+    @PostMapping("/blacklistedipaddress")
+    public @ResponseBody ResponseEntity<Object> createBlacklistedIpAddress(@RequestBody BlacklistedIpAddressDTO blacklistedIpAddress){
+        try {
 
-        BlacklistedIpAddressDTO result = restTemplate.postForObject( "http://server/blacklistedipaddress", blacklistedIpAddress, BlacklistedIpAddressDTO.class);
+            Object result = restTemplate.postForObject( "http://server/blacklistedipaddress", blacklistedIpAddress, Object.class);
 
-        return new ResponseEntity<BlacklistedIpAddressDTO>(result, HttpStatus.OK);
+            return new ResponseEntity<Object>(result, HttpStatus.OK);
+        } catch (Exception e) {
+
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    @GetMapping("/ipaddress")
+    public @ResponseBody ResponseEntity<Object> findIpAddressInfo(@RequestParam(value = "ip") String ip){
+
+        try {
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+                    .getRequest();
+            String remoteAddress = request.getRemoteAddr();
+
+            Object response =  this.restTemplate.getForObject("http://server/ipaddress/info?ip=" + ip + "&requestIp="+remoteAddress, Object.class);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

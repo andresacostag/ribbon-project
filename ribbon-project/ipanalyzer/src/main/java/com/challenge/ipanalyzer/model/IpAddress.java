@@ -1,50 +1,76 @@
 package com.challenge.ipanalyzer.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import java.util.Date;
-
-@Entity
-public class BlacklistedIpAddress {
-
-    @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
-    private Long id;
+public class IpAddress {
 
     private String ipAddress;
 
-    private Date creationDate;
+    private String country;
 
-    public Long getId() {
-        return id;
-    }
+    private String ISOCode;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    private String localCurrency;
+
+    private String localCurrencyCode;
+
+    private Float exchangeRateEUR;
 
     public String getIpAddress() {
+
         return ipAddress;
     }
 
     public void setIpAddress(String ipAddress) {
+
         this.ipAddress = ipAddress;
     }
 
-    public Date getCreationDate() {
-        return creationDate;
+    public String getCountry() {
+
+        return country;
     }
 
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
+    public void setCountry(String country) {
+
+        this.country = country;
     }
 
-    @Override
-    public String toString() {
-        return String.format(
-                "IpAddress[id=%d, Ip='%s']",
-                id, ipAddress);
+    public String getISOCode() {
+
+        return ISOCode;
+    }
+
+    public void setISOCode(String ISOCode) {
+
+        this.ISOCode = ISOCode;
+    }
+
+    public String getLocalCurrency() {
+
+        return localCurrency;
+    }
+
+    public void setLocalCurrency(String localCurrency) {
+
+        this.localCurrency = localCurrency;
+    }
+
+    public String getLocalCurrencyCode() {
+
+        return localCurrencyCode;
+    }
+
+    public void setLocalCurrencyCode(String localCurrencyCode) {
+
+        this.localCurrencyCode = localCurrencyCode;
+    }
+
+    public Float getExchangeRateEUR() {
+
+        return exchangeRateEUR;
+    }
+
+    public void setExchangeRateEUR(Float exchangeRateEUR) {
+
+        this.exchangeRateEUR = exchangeRateEUR;
     }
 }
